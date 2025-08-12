@@ -35,10 +35,7 @@ pub use chrono::{
     Date,
 };
 use chrono::{prelude::*, Duration};
-use eframe::{
-    egui,
-    egui::{Area, Color32, DragValue, Frame, Id, Key, Order, Response, RichText, Ui, Widget},
-};
+use egui::{Area, Color32, DragValue, Frame, Id, Key, Order, Response, RichText, Ui, Widget};
 use num_traits::FromPrimitive;
 
 /// Default values of fields are:
@@ -255,10 +252,10 @@ where
         let formated_date = self.date.format(&self.format_string);
         let button_response = ui.button(formated_date.to_string());
         if button_response.clicked() {
-            ui.memory().toggle_popup(self.id);
+            ui.memory_mut(|memory| memory.toggle_popup(self.id));
         }
 
-        if ui.memory().is_popup_open(self.id) {
+        if ui.memory(|memory| memory.is_popup_open(self.id)) {
             let mut area = Area::new(self.id)
                 .order(Order::Foreground)
                 .default_pos(button_response.rect.left_bottom());
@@ -275,9 +272,9 @@ where
                 .response;
 
             if !button_response.clicked()
-                && (ui.input().key_pressed(Key::Escape) || area_response.clicked_elsewhere())
+                && (ui.input(|input| input.key_pressed(Key::Escape)) || area_response.clicked_elsewhere())
             {
-                ui.memory().toggle_popup(self.id);
+                ui.memory_mut(|memory| memory.toggle_popup(self.id));
             }
         }
         button_response
